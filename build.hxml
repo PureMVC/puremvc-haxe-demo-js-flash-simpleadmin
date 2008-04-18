@@ -4,7 +4,7 @@
 
 # simple admin demo
 #if flash9
--cp src
+#-cp path_to_pureMVC
 -cp demo
 -swf-version 9
 -main SimpleAdmin
@@ -13,7 +13,7 @@
 --override
 
 --next
--cp src
+#-cp path_to_pureMVC
 -cp demo
 -main SimpleAdmin
 -js deploy/simpleAdmin/out.js
