@@ -1,0 +1,20 @@
+# PureMVC haXe Port by Marco Secchi <marco.secchi@puremvc.org>
+# PureMVC - Copyright(c) 2006-08 Futurescale, Inc., Some rights reserved. 
+# Your reuse is governed by the Creative Commons Attribution 3.0 License 
+
+# simple admin demo
+#if flash9
+-cp src
+-cp demo
+-swf-version 9
+-main SimpleAdmin
+-swf deploy/simpleAdmin/out.swf
+-swf-header 800:300:31
+--override
+
+--next
+-cp src
+-cp demo
+-main SimpleAdmin
+-js deploy/simpleAdmin/out.js
+--override
