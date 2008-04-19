@@ -5,16 +5,16 @@
 # simple admin demo
 #if flash9
 #-cp path_to_pureMVC
--cp demo
+-cp src
 -swf-version 9
 -main SimpleAdmin
--swf deploy/simpleAdmin/out.swf
+-swf bin/simpleAdmin/out.swf
 -swf-header 800:300:31
 --override
 
 --next
 #-cp path_to_pureMVC
--cp demo
+-cp src
 -main SimpleAdmin
--js deploy/simpleAdmin/out.js
+-js bin/simpleAdmin/out.js
 --override
