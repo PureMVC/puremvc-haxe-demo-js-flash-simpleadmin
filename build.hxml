@@ -5,7 +5,7 @@
 # simple admin demo
 
 # compile for flash9
--cp path_to_pureMVC
+-cp path_to_pureMVC #change to your pureMVC source path
 -cp src
 -swf-version 9
 -main SimpleAdmin
@@ -15,7 +15,7 @@
 
 --next
 # compile for js
--cp path_to_pureMVC
+-cp path_to_pureMVC #change to your pureMVC source path
 -cp src
 -main SimpleAdmin
 -js bin/simpleAdmin/out.js
