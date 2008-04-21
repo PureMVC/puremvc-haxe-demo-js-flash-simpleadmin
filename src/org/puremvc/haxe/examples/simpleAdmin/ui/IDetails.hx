@@ -7,6 +7,9 @@ package org.puremvc.haxe.examples.simpleAdmin.ui;
 
 import org.puremvc.haxe.examples.simpleAdmin.model.vo.EmployeeVO;
 
+/**
+ * Interface that must be implemented by js/fl9 details views
+ */
 interface IDetails
 {
 	function newEmployee( id: Int ): Void;

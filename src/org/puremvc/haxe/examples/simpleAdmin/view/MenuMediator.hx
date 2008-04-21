@@ -55,19 +55,6 @@ class MenuMediator extends Mediator
 		facade.sendNotification( SimpleAdminFacade.REMOVE_EMPLOYEE );
 	}
 
-	override public function handleNotification( notification: INotification ): Void
-	{
-		switch( notification.getName() )
-		{
-		}	
-	}
-	
-	override public function listNotificationInterests(): Array<String>
-	{
-		return [
-		];
-	}
-	
 	override public function getMediatorName(): String
 	{
 		return NAME;	

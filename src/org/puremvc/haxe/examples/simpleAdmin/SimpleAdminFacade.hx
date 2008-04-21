@@ -15,6 +15,7 @@ import org.puremvc.haxe.examples.simpleAdmin.controller.SaveEmployee;
 class SimpleAdminFacade extends Facade
 {
 
+	//	singleton instance of facade
 	private static var instance: SimpleAdminFacade;
 
 	// Notification name constants

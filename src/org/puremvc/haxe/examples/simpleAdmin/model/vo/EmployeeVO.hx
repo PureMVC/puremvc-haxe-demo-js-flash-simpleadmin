@@ -5,8 +5,12 @@
  */
 package org.puremvc.haxe.examples.simpleAdmin.model.vo;
 
+/**
+ * Stores a single employee data
+ */
 class EmployeeVO
 {
+	//	employee data
 	public var id( getId, null ): Int;
 	public var name( default, default ): String;
 	public var lastname( default, default ): String;

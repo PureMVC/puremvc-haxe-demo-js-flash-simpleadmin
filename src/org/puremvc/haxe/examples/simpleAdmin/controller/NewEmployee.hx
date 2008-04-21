@@ -15,6 +15,10 @@ import org.puremvc.haxe.interfaces.INotification;
 class NewEmployee extends SimpleCommand
 {
 
+	/**
+	 * Retrieves the employees proxy and the details mediator.
+	 * Creates a new employees and shows the (empty) data in the mediator.
+	 */
 	override public function execute( note: INotification ): Void
 	{
 		var proxy = cast( facade.retrieveProxy( EmployeesProxy.NAME ), EmployeesProxy );

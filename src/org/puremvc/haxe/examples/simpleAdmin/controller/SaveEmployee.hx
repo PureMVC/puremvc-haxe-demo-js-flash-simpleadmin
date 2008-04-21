@@ -16,6 +16,11 @@ import org.puremvc.haxe.interfaces.INotification;
 class SaveEmployee extends SimpleCommand
 {
 
+
+	/**
+	 * Saves the employee data, retrieving it from the details mediator
+	 * ad sends a notification to all observer to update data
+	 */
 	override public function execute( note: INotification ): Void
 	{
 		var proxy = cast( facade.retrieveProxy( EmployeesProxy.NAME ), EmployeesProxy );

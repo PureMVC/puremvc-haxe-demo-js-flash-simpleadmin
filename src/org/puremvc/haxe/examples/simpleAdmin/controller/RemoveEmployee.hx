@@ -15,6 +15,11 @@ import org.puremvc.haxe.interfaces.INotification;
 class RemoveEmployee extends SimpleCommand
 {
 
+	/**
+	 * Retrieves from the mediator the id of the employee to delete.
+	 * Removes the emplyee from proxy and sends a notification to update list
+	 * and to remove text from the detail view
+	 */
 	override public function execute( note: INotification ): Void
 	{
 		var mediator = cast( facade.retrieveMediator( DetailsMediator.NAME ), DetailsMediator );

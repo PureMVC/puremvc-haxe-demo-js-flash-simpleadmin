@@ -5,6 +5,9 @@
  */
 package org.puremvc.haxe.examples.simpleAdmin.ui;
 
+/**
+ * Interface that must be implemented by js/fl9 menu views
+ */
 interface IMenu
 {
 }
