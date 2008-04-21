@@ -3,8 +3,9 @@
 # Copyright(c) 2008 Marco Secchi, Some rights reserved.
 
 # simple admin demo
-#if flash9
-#-cp path_to_pureMVC
+
+# compile for flash9
+-cp path_to_pureMVC
 -cp src
 -swf-version 9
 -main SimpleAdmin
@@ -13,7 +14,8 @@
 --override
 
 --next
-#-cp path_to_pureMVC
+# compile for js
+-cp path_to_pureMVC
 -cp src
 -main SimpleAdmin
 -js bin/simpleAdmin/out.js
