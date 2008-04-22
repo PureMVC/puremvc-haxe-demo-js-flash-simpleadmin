@@ -18,9 +18,6 @@ class EmployeesProxy extends Proxy
 	
 	/**
 	 * Constructor.
-	 * 
-	 * <p>Initilizes the proxy</p>. 
-	 * 
 	 */
 	public function new()
 	{
@@ -35,27 +32,41 @@ class EmployeesProxy extends Proxy
 		return data;
 	}
 	
+	/**
+	 * Returns the next available id for a new employee.
+	 */
 	public function newEmployeeId(): Int
 	{
-		var id = getNewID();
-		return id;
+		return getNewID();
 	}
 	
+	/**
+	 * Getter method for a single employee value object from the data.
+	 */
 	public function getEmployee( id: Int ): EmployeeVO
 	{
 		return getEmployees().get( id );
 	}
 	
+	/**
+	 * Removes an employee value object from the data.
+	 */
 	public function removeEmployee( id: Int ): Void
 	{
 		getEmployees().remove( id );
 	}
 	
+	/**
+	 * Adds an employee value object to the data.
+	 */
 	public function saveEmployee( vo: EmployeeVO ): Void
 	{
 		data.set( vo.id, vo );
 	}
 	
+	/**
+	 * Returns the next highest id.
+	 */
 	private function getNewID(): Int
 	{
 		var id: Int = 1;

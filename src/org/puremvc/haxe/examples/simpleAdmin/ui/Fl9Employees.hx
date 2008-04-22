@@ -14,13 +14,20 @@ import flash.display.Sprite;
 
 class Fl9Employees implements IEmployees
 {
+	//	the view
 	private var _container: Sprite;
 	
+	/**
+	 * Constructor.
+	 */
 	public function new( container: Sprite )
 	{
 		_container = container;
 	}
 	
+	/**
+	 * Removes all children in the view and creates the new ones.
+	 */
 	public	function updateList( map: IntHash<EmployeeVO> ): Void
 	{
 		while( _container.numChildren > 0 )
@@ -35,6 +42,9 @@ class Fl9Employees implements IEmployees
 		}
 	}
 	
+	/**
+	 * Returns the view.
+	 */
 	public function getContainer(): Sprite
 	{
 		return _container;
@@ -42,6 +52,9 @@ class Fl9Employees implements IEmployees
 	
 }
 
+/**
+ * The button component.
+ */
 class ListButton extends TextField
 {
 	public var id( default, null ): Int;

@@ -11,9 +11,12 @@ import js.Dom;
 
 class JsDetails implements IDetails
 {
-
+	//	the view
 	private var _container: HtmlDom;
 	
+	/**
+	 * Constructor.
+	 */
 	public function new( container: HtmlDom )
 	{
 		_container = container;
@@ -21,6 +24,9 @@ class JsDetails implements IDetails
 		newEmployee( 1 );
 	}
 	
+	/**
+	 * Empties the input fields for a new employee.
+	 */
 	public function newEmployee( id: Int ): Void
 	{
 		var em_id = js.Lib.document.getElementById( "em_id" );
@@ -30,6 +36,9 @@ class JsDetails implements IDetails
 		cast( js.Lib.document.getElementById( "em_role" ) ).value = "";
 	}
 	
+	/**
+	 * Returns input fields data as an [EmployeeVO].
+	 */
 	public function getDetails(): EmployeeVO
 	{
 		var vo = new EmployeeVO( Std.parseInt( js.Lib.document.getElementById( "em_id" ).innerHTML ) );
@@ -39,6 +48,9 @@ class JsDetails implements IDetails
 		return vo;
 	}
 
+	/**
+	 * Fills input fields with the passed [EmpoyeeVO] data.
+	 */
 	public function setDetails( vo: EmployeeVO ): Void
 	{
 		js.Lib.document.getElementById( "em_id" ).innerHTML = Std.string( vo.id );

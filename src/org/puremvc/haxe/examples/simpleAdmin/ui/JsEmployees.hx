@@ -11,14 +11,20 @@ import js.Dom;
 
 class JsEmployees implements IEmployees
 {
-
+	//	the view
 	public var _container: HtmlDom;
 	
+	/**
+	 * Constructor.
+	 */
 	public function new( container: HtmlDom )
 	{
 		_container = container;
 	}
 
+	/**
+	 * Removes all children in the view and creates the new ones.
+	 */
 	public	function updateList( map: IntHash<EmployeeVO> ): Void
 	{
 		_container.innerHTML = "";
@@ -31,6 +37,9 @@ class JsEmployees implements IEmployees
 		}
 	}
 	
+	/**
+	 * Returns the view.
+	 */
 	public function getContainer(): HtmlDom
 	{
 		return _container;

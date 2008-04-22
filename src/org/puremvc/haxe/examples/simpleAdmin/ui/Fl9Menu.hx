@@ -12,12 +12,17 @@ import flash.text.TextFieldAutoSize;
 
 class Fl9Menu implements IMenu
 {
+	//	the view
 	private var _container: Sprite;
 	
+	//	view components
 	public var new_e: TextField;
 	public var remove_e: TextField;
 	public var save_e: TextField;
 	
+	/**
+	 * Constructor.
+	 */
 	public function new( container: Sprite )
 	{
 		_container = container;
@@ -25,9 +30,12 @@ class Fl9Menu implements IMenu
 		initGraphics();
 	}
 	
+	
+	/**
+	 * Creates menu components.
+	 */
 	private function initGraphics(): Void
-	{
-		
+	{		
 		new_e = new MenuButton( "new" );
 		_container.addChild( new_e );
 		
@@ -41,6 +49,9 @@ class Fl9Menu implements IMenu
 	}
 }
 
+/**
+ * The menu button component.
+ */
 class MenuButton extends TextField
 {
 	public function new( label: String )

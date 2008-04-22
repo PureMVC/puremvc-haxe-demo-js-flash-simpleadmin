@@ -19,6 +19,9 @@ class DetailsMediator extends Mediator
 
 	public static inline var NAME: String = "DetailsMediator";
 
+	/**
+	 * Constructor.
+	 */
 	public function new( viewComponent: IDetails )
 	{
 		super( viewComponent );
@@ -26,6 +29,9 @@ class DetailsMediator extends Mediator
 		employeesProxy = cast( facade.retrieveProxy( EmployeesProxy.NAME ), EmployeesProxy );
 	}
 
+	/**
+	 * Handle [INotification]s.
+	 */ 
 	override public function handleNotification( notification: INotification ): Void
 	{
 		switch( notification.getName() )
@@ -37,6 +43,10 @@ class DetailsMediator extends Mediator
 		}	
 	}
 	
+	/**
+	 * List the [INotification] names this
+	 * [Mediator] is interested in being notified of.
+	 */
 	override public function listNotificationInterests(): Array<String>
 	{
 		return [
@@ -45,21 +55,33 @@ class DetailsMediator extends Mediator
 		];
 	}
 	
+	/*
+	 * Returns the name of the mediator
+	 */
 	override public function getMediatorName(): String
 	{
 		return NAME;	
 	}
 	
+	/*
+	 * Returns the view object
+	 */
 	private function getMenu(): IDetails
 	{
 		return viewComponent;
 	}
 	
+	/*
+	 * Tells the view to refresh, showing the newly created employee
+	 */
 	public function newEmployee( id: Int ): Void
 	{
 		viewComponent.newEmployee( id );
 	}
 	
+	/*
+	 * Returns employee data contained in the view
+	 */
 	public function getEmployeeDetails(): EmployeeVO
 	{
 		return viewComponent.getDetails();

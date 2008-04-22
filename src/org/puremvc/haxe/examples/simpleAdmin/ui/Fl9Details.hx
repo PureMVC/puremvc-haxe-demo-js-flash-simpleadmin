@@ -15,12 +15,17 @@ import flash.text.TextFieldAutoSize;
 
 class Fl9Details implements IDetails
 {
+	//	the view
 	private var _container: Sprite;
+
 	private var det_id: DetailsInput;
 	private var name: DetailsInput;
 	private var lastname: DetailsInput;
 	private var role: DetailsInput;
 	
+	/**
+	 * Constructor.
+	 */
 	public function new( container: Sprite )
 	{
 		_container = container;
@@ -30,6 +35,9 @@ class Fl9Details implements IDetails
 		newEmployee( 1 );
 	}
 	
+	/**
+	 * Creates view components.
+	 */
 	private function initGraphics(): Void
 	{
 		det_id = new DetailsInput( "id:", TextFieldType.DYNAMIC );
@@ -45,6 +53,9 @@ class Fl9Details implements IDetails
 		_container.addChild( role );
 	}
 
+	/**
+	 * Empties the input fields for a new employee.
+	 */
 	public function newEmployee( id: Int ): Void
 	{
 		det_id.value.text = Std.string( id );
@@ -53,6 +64,9 @@ class Fl9Details implements IDetails
 		role.value.text = "";
 	}
 
+	/**
+	 * Returns input fields data as an [EmployeeVO].
+	 */
 	public function getDetails(): EmployeeVO
 	{
 		var vo = new EmployeeVO( Std.parseInt( det_id.value.text ) );
@@ -62,6 +76,9 @@ class Fl9Details implements IDetails
 		return vo;
 	}
 	
+	/**
+	 * Fills input fields with the passed [EmpoyeeVO] data.
+	 */
 	public function setDetails( vo: EmployeeVO ): Void
 	{
 		det_id.value.text = Std.string( vo.id );
@@ -75,6 +92,9 @@ class Fl9Details implements IDetails
 
 }
 
+/**
+ * Teh details component.
+ */
 class DetailsInput extends Sprite
 {
 	public var value( default, default ): TextField;

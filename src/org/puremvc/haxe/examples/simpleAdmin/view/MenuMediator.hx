@@ -24,6 +24,10 @@ class MenuMediator extends Mediator
 
 	public static inline var NAME: String = "MenuMediator";
 
+	/**
+	 * Constructor.
+	 * Initializes event listeners for the view
+	 */
 	public function new( viewComponent: IMenu )
 	{
 		super( viewComponent );
@@ -40,26 +44,44 @@ class MenuMediator extends Mediator
 		#end
 	}
 	
+	/*
+	 * Click Handler for a new employee. Simply sends a notification
+	 * to all registered observers.
+	 */
 	private function onNewEmployee( evt ): Void
 	{
 		facade.sendNotification( SimpleAdminFacade.NEW_EMPLOYEE );
 	}
 
+	/*
+	 * Click Handler for saving an employee. Simply sends a notification
+	 * to all registered observers.
+	 */
 	private function onSaveEmployee( evt ): Void
 	{
 		facade.sendNotification( SimpleAdminFacade.SAVE_EMPLOYEE );
 	}
 
+	/*
+	 * Click Handler for removing an employee. Simply sends a notification
+	 * to all registered observers.
+	 */
 	private function onRemoveEmployee( evt ): Void
 	{
 		facade.sendNotification( SimpleAdminFacade.REMOVE_EMPLOYEE );
 	}
 
+	/*
+	 * Returns the name of the mediator
+	 */
 	override public function getMediatorName(): String
 	{
 		return NAME;	
 	}
 	
+	/*
+	 * Returns the view object
+	 */
 	private function getMenu(): IMenu
 	{
 		return viewComponent;
