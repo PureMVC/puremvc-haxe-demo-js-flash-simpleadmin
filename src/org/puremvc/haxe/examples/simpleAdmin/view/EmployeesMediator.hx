@@ -32,7 +32,7 @@ class EmployeesMediator extends Mediator
 		
 		#if js
 		js.Lib.document.getElementById( "employees" ).onclick = onEmployeeClick;
-		#else flash9
+		#elseif flash9
 		cast( viewComponent ).getContainer().addEventListener( MouseEvent.CLICK, onEmployeeClick );
 		#else error
 		#end
@@ -49,7 +49,7 @@ class EmployeesMediator extends Mediator
 		var id;
 		#if js
 		id = evt.target.getAttribute( "href" ).split( "#" )[ 1 ];
-		#else flash9
+		#elseif flash9
 		id = evt.target.id;
 		#else error
 		#end

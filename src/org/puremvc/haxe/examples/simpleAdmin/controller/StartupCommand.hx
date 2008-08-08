@@ -16,7 +16,7 @@ import org.puremvc.haxe.interfaces.INotification;
 import org.puremvc.haxe.examples.simpleAdmin.ui.JsMenu;
 import org.puremvc.haxe.examples.simpleAdmin.ui.JsEmployees;
 import org.puremvc.haxe.examples.simpleAdmin.ui.JsDetails;
-#else flash9
+#elseif flash9
 import org.puremvc.haxe.examples.simpleAdmin.ui.Fl9Menu;
 import org.puremvc.haxe.examples.simpleAdmin.ui.Fl9Employees;
 import org.puremvc.haxe.examples.simpleAdmin.ui.Fl9Details;
@@ -39,7 +39,7 @@ class StartupCommand extends SimpleCommand
 		#if js
 		menu_container = js.Lib.document.getElementById( "menu" );
 		menu = new JsMenu( menu_container );
-		#else flash9
+		#elseif flash9
 		menu_container = new Sprite();
 		flash.Lib.current.addChild( menu_container );
 		menu = new Fl9Menu( menu_container );
@@ -52,7 +52,7 @@ class StartupCommand extends SimpleCommand
 		#if js
 		employees_container = js.Lib.document.getElementById( "employees" );
 		employees = new JsEmployees( employees_container );
-		#else flash9
+		#elseif flash9
 		employees_container = new Sprite();
 		employees_container.y = menu_container.height + 5;
 		employees_container.x = 200;
@@ -67,7 +67,7 @@ class StartupCommand extends SimpleCommand
 		#if js
 		details_container = js.Lib.document.getElementById( "details" );
 		details = new JsDetails( details_container );
-		#else flash9
+		#elseif flash9
 		details_container = new Sprite();
 		details_container.y = menu_container.height + 5;
 		flash.Lib.current.addChild( details_container );

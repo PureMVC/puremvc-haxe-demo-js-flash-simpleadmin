@@ -99,7 +99,7 @@ class DetailsInput extends Sprite
 {
 	public var value( default, default ): TextField;
 
-	public function new( label: String, type: String )
+	public function new( label: String, type )
 	{
 		super();
 

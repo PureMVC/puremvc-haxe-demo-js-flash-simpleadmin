@@ -10,6 +10,7 @@ org.puremvc.haxe.interfaces.IView.prototype.notifyObservers = null;
 org.puremvc.haxe.interfaces.IView.prototype.registerMediator = null;
 org.puremvc.haxe.interfaces.IView.prototype.registerObserver = null;
 org.puremvc.haxe.interfaces.IView.prototype.removeMediator = null;
+org.puremvc.haxe.interfaces.IView.prototype.removeObserver = null;
 org.puremvc.haxe.interfaces.IView.prototype.retrieveMediator = null;
 org.puremvc.haxe.interfaces.IView.prototype.__class__ = org.puremvc.haxe.interfaces.IView;
 org.puremvc.haxe.interfaces.INotifier = function() { }
@@ -233,6 +234,91 @@ org.puremvc.haxe.examples.simpleAdmin.view.DetailsMediator.prototype.newEmployee
 	this.viewComponent.newEmployee(id);
 }
 org.puremvc.haxe.examples.simpleAdmin.view.DetailsMediator.prototype.__class__ = org.puremvc.haxe.examples.simpleAdmin.view.DetailsMediator;
+org.puremvc.haxe.core = {}
+org.puremvc.haxe.core.View = function(p) { if( p === $_ ) return; {
+	org.puremvc.haxe.core.View.instance = this;
+	this.mediatorMap = new Hash();
+	this.observerMap = new Hash();
+	this.initializeView();
+}}
+org.puremvc.haxe.core.View.__name__ = ["org","puremvc","haxe","core","View"];
+org.puremvc.haxe.core.View.getInstance = function() {
+	if(org.puremvc.haxe.core.View.instance == null) org.puremvc.haxe.core.View.instance = new org.puremvc.haxe.core.View();
+	return org.puremvc.haxe.core.View.instance;
+}
+org.puremvc.haxe.core.View.instance = null;
+org.puremvc.haxe.core.View.prototype.hasMediator = function(mediatorName) {
+	return this.mediatorMap.exists(mediatorName);
+}
+org.puremvc.haxe.core.View.prototype.initializeView = function() {
+	null;
+}
+org.puremvc.haxe.core.View.prototype.mediatorMap = null;
+org.puremvc.haxe.core.View.prototype.notifyObservers = function(notification) {
+	if(this.observerMap.exists(notification.getName())) {
+		var iterator = this.observerMap.get(notification.getName()).iterator();
+		{ var $it0 = iterator;
+		while( $it0.hasNext() ) { var observer = $it0.next();
+		observer.notifyObserver(notification);
+		}}
+	}
+}
+org.puremvc.haxe.core.View.prototype.observerMap = null;
+org.puremvc.haxe.core.View.prototype.registerMediator = function(mediator) {
+	this.mediatorMap.set(mediator.getMediatorName(),mediator);
+	var interests = mediator.listNotificationInterests();
+	if(interests.length > 0) {
+		var observer = new org.puremvc.haxe.patterns.observer.Observer($closure(mediator,"handleNotification"),mediator);
+		{
+			var _g1 = 0, _g = interests.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.registerObserver(interests[i],observer);
+			}
+		}
+	}
+	mediator.onRegister();
+}
+org.puremvc.haxe.core.View.prototype.registerObserver = function(notificationName,observer) {
+	if(!this.observerMap.exists(notificationName)) this.observerMap.set(notificationName,new List());
+	this.observerMap.get(notificationName).add(observer);
+}
+org.puremvc.haxe.core.View.prototype.removeMediator = function(mediatorName) {
+	var mediator = this.mediatorMap.get(mediatorName);
+	if(mediator != null) {
+		var interests = mediator.listNotificationInterests();
+		{
+			var _g1 = 0, _g = interests.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.removeObserver(interests[i],mediator);
+			}
+		}
+		this.mediatorMap.remove(mediatorName);
+		mediator.onRemove();
+	}
+	return mediator;
+}
+org.puremvc.haxe.core.View.prototype.removeObserver = function(notificationName,notifyContext) {
+	var observers = this.observerMap.get(notificationName);
+	{ var $it1 = observers.iterator();
+	while( $it1.hasNext() ) { var observer = $it1.next();
+	{
+		if(observer.compareNotifyContext(notifyContext) == true) {
+			observers.remove(observer);
+			break;
+		}
+	}
+	}}
+	if(observers.isEmpty()) {
+		this.observerMap.remove(notificationName);
+	}
+}
+org.puremvc.haxe.core.View.prototype.retrieveMediator = function(mediatorName) {
+	return this.mediatorMap.get(mediatorName);
+}
+org.puremvc.haxe.core.View.prototype.__class__ = org.puremvc.haxe.core.View;
+org.puremvc.haxe.core.View.__interfaces__ = [org.puremvc.haxe.interfaces.IView];
 org.puremvc.haxe.examples.simpleAdmin.controller.StartupCommand = function(p) { if( p === $_ ) return; {
 	org.puremvc.haxe.patterns.command.SimpleCommand.apply(this,[]);
 }}
@@ -260,32 +346,27 @@ org.puremvc.haxe.examples.simpleAdmin.controller.StartupCommand.prototype.execut
 org.puremvc.haxe.examples.simpleAdmin.controller.StartupCommand.prototype.__class__ = org.puremvc.haxe.examples.simpleAdmin.controller.StartupCommand;
 Reflect = function() { }
 Reflect.__name__ = ["Reflect"];
-Reflect.empty = function() {
-	return {}
-}
 Reflect.hasField = function(o,field) {
-	{
-		if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
-		var arr = Reflect.fields(o);
-		{ var $it0 = arr.iterator();
-		while( $it0.hasNext() ) { var t = $it0.next();
-		if(t == field) return true;
-		}}
-		return false;
-	}
+	if(o.hasOwnProperty != null) return o.hasOwnProperty(field);
+	var arr = Reflect.fields(o);
+	{ var $it2 = arr.iterator();
+	while( $it2.hasNext() ) { var t = $it2.next();
+	if(t == field) return true;
+	}}
+	return false;
 }
 Reflect.field = function(o,field) {
+	var v = null;
 	try {
-		return o[field];
+		v = o[field];
 	}
-	catch( $e1 ) {
+	catch( $e3 ) {
 		{
-			var e = $e1;
-			{
-				return null;
-			}
+			var e = $e3;
+			null;
 		}
 	}
+	return v;
 }
 Reflect.setField = function(o,field,value) {
 	o[field] = value;
@@ -295,38 +376,36 @@ Reflect.callMethod = function(o,func,args) {
 }
 Reflect.fields = function(o) {
 	if(o == null) return new Array();
-	{
-		var a = new Array();
-		if(o.hasOwnProperty) {
-			
+	var a = new Array();
+	if(o.hasOwnProperty) {
+		
 					for(var i in o)
 						if( o.hasOwnProperty(i) )
 							a.push(i);
 				;
+	}
+	else {
+		var t;
+		try {
+			t = o.__proto__;
 		}
-		else {
-			var t;
-			try {
-				t = o.__proto__;
-			}
-			catch( $e2 ) {
+		catch( $e4 ) {
+			{
+				var e = $e4;
 				{
-					var e = $e2;
-					{
-						t = null;
-					}
+					t = null;
 				}
 			}
-			if(t != null) o.__proto__ = null;
-			
+		}
+		if(t != null) o.__proto__ = null;
+		
 					for(var i in o)
 						if( i != "__proto__" )
 							a.push(i);
 				;
-			if(t != null) o.__proto__ = t;
-		}
-		return a;
+		if(t != null) o.__proto__ = t;
 	}
+	return a;
 }
 Reflect.isFunction = function(f) {
 	return typeof(f) == "function" && f.__name__ == null;
@@ -345,20 +424,18 @@ Reflect.isObject = function(v) {
 	return (t == "string" || (t == "object" && !v.__enum__) || (t == "function" && v.__name__ != null));
 }
 Reflect.deleteField = function(o,f) {
-	{
-		if(!Reflect.hasField(o,f)) return false;
-		delete(o[f]);
-		return true;
-	}
+	if(!Reflect.hasField(o,f)) return false;
+	delete(o[f]);
+	return true;
 }
 Reflect.copy = function(o) {
-	var o2 = Reflect.empty();
+	var o2 = { }
 	{
 		var _g = 0, _g1 = Reflect.fields(o);
 		while(_g < _g1.length) {
 			var f = _g1[_g];
 			++_g;
-			Reflect.setField(o2,f,Reflect.field(o,f));
+			o2[f] = Reflect.field(o,f);
 		}
 	}
 	return o2;
@@ -377,80 +454,6 @@ Reflect.makeVarArgs = function(f) {
 	}
 }
 Reflect.prototype.__class__ = Reflect;
-org.puremvc.haxe.core = {}
-org.puremvc.haxe.core.view = {}
-org.puremvc.haxe.core.view.View = function(p) { if( p === $_ ) return; {
-	org.puremvc.haxe.core.view.View.instance = this;
-	this.mediatorMap = new Hash();
-	this.observerMap = new Hash();
-	this.initializeView();
-}}
-org.puremvc.haxe.core.view.View.__name__ = ["org","puremvc","haxe","core","view","View"];
-org.puremvc.haxe.core.view.View.getInstance = function() {
-	if(org.puremvc.haxe.core.view.View.instance == null) org.puremvc.haxe.core.view.View.instance = new org.puremvc.haxe.core.view.View();
-	return org.puremvc.haxe.core.view.View.instance;
-}
-org.puremvc.haxe.core.view.View.instance = null;
-org.puremvc.haxe.core.view.View.prototype.hasMediator = function(mediatorName) {
-	return this.mediatorMap.exists(mediatorName);
-}
-org.puremvc.haxe.core.view.View.prototype.initializeView = function() {
-	null;
-}
-org.puremvc.haxe.core.view.View.prototype.mediatorMap = null;
-org.puremvc.haxe.core.view.View.prototype.notifyObservers = function(notification) {
-	if(this.observerMap.exists(notification.getName())) {
-		var iterator = this.observerMap.get(notification.getName()).iterator();
-		{ var $it3 = iterator;
-		while( $it3.hasNext() ) { var observer = $it3.next();
-		observer.notifyObserver(notification);
-		}}
-	}
-}
-org.puremvc.haxe.core.view.View.prototype.observerMap = null;
-org.puremvc.haxe.core.view.View.prototype.registerMediator = function(mediator) {
-	this.mediatorMap.set(mediator.getMediatorName(),mediator);
-	var interests = mediator.listNotificationInterests();
-	if(interests.length > 0) {
-		var observer = new org.puremvc.haxe.patterns.observer.Observer($closure(mediator,"handleNotification"),mediator);
-		{
-			var _g1 = 0, _g = interests.length;
-			while(_g1 < _g) {
-				var i = _g1++;
-				this.registerObserver(interests[i],observer);
-			}
-		}
-	}
-	mediator.onRegister();
-}
-org.puremvc.haxe.core.view.View.prototype.registerObserver = function(notificationName,observer) {
-	if(!this.observerMap.exists(notificationName)) this.observerMap.set(notificationName,new List());
-	this.observerMap.get(notificationName).add(observer);
-}
-org.puremvc.haxe.core.view.View.prototype.removeMediator = function(mediatorName) {
-	{ var $it4 = this.observerMap.keys();
-	while( $it4.hasNext() ) { var notificationName = $it4.next();
-	{
-		var observers = this.observerMap.get(notificationName);
-		{ var $it5 = observers.iterator();
-		while( $it5.hasNext() ) { var observer = $it5.next();
-		{
-			if(observer.compareNotifyContext(this.retrieveMediator(mediatorName)) == true) observers.remove(observer);
-		}
-		}}
-		if(observers.isEmpty()) this.observerMap.remove(notificationName);
-	}
-	}}
-	var mediator = this.mediatorMap.get(mediatorName);
-	this.mediatorMap.remove(mediatorName);
-	if(mediator != null) mediator.onRemove();
-	return mediator;
-}
-org.puremvc.haxe.core.view.View.prototype.retrieveMediator = function(mediatorName) {
-	return this.mediatorMap.get(mediatorName);
-}
-org.puremvc.haxe.core.view.View.prototype.__class__ = org.puremvc.haxe.core.view.View;
-org.puremvc.haxe.core.view.View.__interfaces__ = [org.puremvc.haxe.interfaces.IView];
 org.puremvc.haxe.examples.simpleAdmin.ui = {}
 org.puremvc.haxe.examples.simpleAdmin.ui.IEmployees = function() { }
 org.puremvc.haxe.examples.simpleAdmin.ui.IEmployees.__name__ = ["org","puremvc","haxe","examples","simpleAdmin","ui","IEmployees"];
@@ -466,8 +469,8 @@ org.puremvc.haxe.examples.simpleAdmin.ui.JsEmployees.prototype.getContainer = fu
 }
 org.puremvc.haxe.examples.simpleAdmin.ui.JsEmployees.prototype.updateList = function(map) {
 	this._container.innerHTML = "";
-	{ var $it6 = map.iterator();
-	while( $it6.hasNext() ) { var i = $it6.next();
+	{ var $it5 = map.iterator();
+	while( $it5.hasNext() ) { var i = $it5.next();
 	{
 		var a = js.Lib.document.createElement("A");
 		a.setAttribute("href","#" + i.getId());
@@ -491,7 +494,7 @@ org.puremvc.haxe.patterns.observer.Observer = function(notifyMethod,notifyContex
 }}
 org.puremvc.haxe.patterns.observer.Observer.__name__ = ["org","puremvc","haxe","patterns","observer","Observer"];
 org.puremvc.haxe.patterns.observer.Observer.prototype.compareNotifyContext = function(object) {
-	return object === this.context;
+	return object == this.context;
 }
 org.puremvc.haxe.patterns.observer.Observer.prototype.context = null;
 org.puremvc.haxe.patterns.observer.Observer.prototype.getNotifyContext = function() {
@@ -553,6 +556,7 @@ org.puremvc.haxe.interfaces.IFacade.__name__ = ["org","puremvc","haxe","interfac
 org.puremvc.haxe.interfaces.IFacade.prototype.hasCommand = null;
 org.puremvc.haxe.interfaces.IFacade.prototype.hasMediator = null;
 org.puremvc.haxe.interfaces.IFacade.prototype.hasProxy = null;
+org.puremvc.haxe.interfaces.IFacade.prototype.notifyObservers = null;
 org.puremvc.haxe.interfaces.IFacade.prototype.registerCommand = null;
 org.puremvc.haxe.interfaces.IFacade.prototype.registerMediator = null;
 org.puremvc.haxe.interfaces.IFacade.prototype.registerProxy = null;
@@ -586,7 +590,7 @@ org.puremvc.haxe.patterns.facade.Facade.prototype.hasProxy = function(proxyName)
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.initializeController = function() {
 	if(this.controller != null) return;
-	this.controller = org.puremvc.haxe.core.controller.Controller.getInstance();
+	this.controller = org.puremvc.haxe.core.Controller.getInstance();
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.initializeFacade = function() {
 	this.initializeModel();
@@ -595,11 +599,11 @@ org.puremvc.haxe.patterns.facade.Facade.prototype.initializeFacade = function() 
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.initializeModel = function() {
 	if(this.model != null) return;
-	this.model = org.puremvc.haxe.core.model.Model.getInstance();
+	this.model = org.puremvc.haxe.core.Model.getInstance();
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.initializeView = function() {
 	if(this.view != null) return;
-	this.view = org.puremvc.haxe.core.view.View.getInstance();
+	this.view = org.puremvc.haxe.core.View.getInstance();
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.model = null;
 org.puremvc.haxe.patterns.facade.Facade.prototype.notifyObservers = function(notification) {
@@ -618,12 +622,12 @@ org.puremvc.haxe.patterns.facade.Facade.prototype.removeCommand = function(notif
 	this.controller.removeCommand(notificationName);
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.removeMediator = function(mediatorName) {
-	var mediator;
+	var mediator = null;
 	if(this.view != null) mediator = this.view.removeMediator(mediatorName);
 	return mediator;
 }
 org.puremvc.haxe.patterns.facade.Facade.prototype.removeProxy = function(proxyName) {
-	var proxy;
+	var proxy = null;
 	if(this.model != null) proxy = this.model.removeProxy(proxyName);
 	return proxy;
 }
@@ -707,8 +711,8 @@ org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.getEmployee
 }
 org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.getNewID = function() {
 	var id = 1;
-	{ var $it7 = this.getEmployees().keys();
-	while( $it7.hasNext() ) { var i = $it7.next();
+	{ var $it6 = this.getEmployees().keys();
+	while( $it6.hasNext() ) { var i = $it6.next();
 	{
 		if(i >= id) {
 			id = i;
@@ -719,8 +723,7 @@ org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.getNewID = 
 	return id;
 }
 org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.newEmployeeId = function() {
-	var id = this.getNewID();
-	return id;
+	return this.getNewID();
 }
 org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.removeEmployee = function(id) {
 	this.getEmployees().remove(id);
@@ -729,48 +732,6 @@ org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.saveEmploye
 	this.data.set(vo.getId(),vo);
 }
 org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy.prototype.__class__ = org.puremvc.haxe.examples.simpleAdmin.model.EmployeesProxy;
-org.puremvc.haxe.interfaces.IController = function() { }
-org.puremvc.haxe.interfaces.IController.__name__ = ["org","puremvc","haxe","interfaces","IController"];
-org.puremvc.haxe.interfaces.IController.prototype.executeCommand = null;
-org.puremvc.haxe.interfaces.IController.prototype.hasCommand = null;
-org.puremvc.haxe.interfaces.IController.prototype.registerCommand = null;
-org.puremvc.haxe.interfaces.IController.prototype.removeCommand = null;
-org.puremvc.haxe.interfaces.IController.prototype.__class__ = org.puremvc.haxe.interfaces.IController;
-org.puremvc.haxe.core.controller = {}
-org.puremvc.haxe.core.controller.Controller = function(p) { if( p === $_ ) return; {
-	org.puremvc.haxe.core.controller.Controller.instance = this;
-	this.commandMap = new Hash();
-	this.initializeController();
-}}
-org.puremvc.haxe.core.controller.Controller.__name__ = ["org","puremvc","haxe","core","controller","Controller"];
-org.puremvc.haxe.core.controller.Controller.getInstance = function() {
-	if(org.puremvc.haxe.core.controller.Controller.instance == null) org.puremvc.haxe.core.controller.Controller.instance = new org.puremvc.haxe.core.controller.Controller();
-	return org.puremvc.haxe.core.controller.Controller.instance;
-}
-org.puremvc.haxe.core.controller.Controller.instance = null;
-org.puremvc.haxe.core.controller.Controller.prototype.commandMap = null;
-org.puremvc.haxe.core.controller.Controller.prototype.executeCommand = function(note) {
-	var commandClassRef = this.commandMap.get(note.getName());
-	if(commandClassRef == null) return;
-	var commandInstance = Type.createInstance(commandClassRef,[]);
-	commandInstance.execute(note);
-}
-org.puremvc.haxe.core.controller.Controller.prototype.hasCommand = function(notificationName) {
-	return this.commandMap.exists(notificationName);
-}
-org.puremvc.haxe.core.controller.Controller.prototype.initializeController = function() {
-	this.view = org.puremvc.haxe.core.view.View.getInstance();
-}
-org.puremvc.haxe.core.controller.Controller.prototype.registerCommand = function(notificationName,commandClassRef) {
-	if(!this.commandMap.exists(notificationName)) this.view.registerObserver(notificationName,new org.puremvc.haxe.patterns.observer.Observer($closure(this,"executeCommand"),this));
-	this.commandMap.set(notificationName,commandClassRef);
-}
-org.puremvc.haxe.core.controller.Controller.prototype.removeCommand = function(notificationName) {
-	this.commandMap.remove(notificationName);
-}
-org.puremvc.haxe.core.controller.Controller.prototype.view = null;
-org.puremvc.haxe.core.controller.Controller.prototype.__class__ = org.puremvc.haxe.core.controller.Controller;
-org.puremvc.haxe.core.controller.Controller.__interfaces__ = [org.puremvc.haxe.interfaces.IController];
 org.puremvc.haxe.examples.simpleAdmin.ui.IMenu = function() { }
 org.puremvc.haxe.examples.simpleAdmin.ui.IMenu.__name__ = ["org","puremvc","haxe","examples","simpleAdmin","ui","IMenu"];
 org.puremvc.haxe.examples.simpleAdmin.ui.IMenu.prototype.__class__ = org.puremvc.haxe.examples.simpleAdmin.ui.IMenu;
@@ -809,6 +770,50 @@ org.puremvc.haxe.examples.simpleAdmin.ui.JsDetails.prototype.setDetails = functi
 }
 org.puremvc.haxe.examples.simpleAdmin.ui.JsDetails.prototype.__class__ = org.puremvc.haxe.examples.simpleAdmin.ui.JsDetails;
 org.puremvc.haxe.examples.simpleAdmin.ui.JsDetails.__interfaces__ = [org.puremvc.haxe.examples.simpleAdmin.ui.IDetails];
+org.puremvc.haxe.interfaces.IController = function() { }
+org.puremvc.haxe.interfaces.IController.__name__ = ["org","puremvc","haxe","interfaces","IController"];
+org.puremvc.haxe.interfaces.IController.prototype.executeCommand = null;
+org.puremvc.haxe.interfaces.IController.prototype.hasCommand = null;
+org.puremvc.haxe.interfaces.IController.prototype.registerCommand = null;
+org.puremvc.haxe.interfaces.IController.prototype.removeCommand = null;
+org.puremvc.haxe.interfaces.IController.prototype.__class__ = org.puremvc.haxe.interfaces.IController;
+org.puremvc.haxe.core.Controller = function(p) { if( p === $_ ) return; {
+	org.puremvc.haxe.core.Controller.instance = this;
+	this.commandMap = new Hash();
+	this.initializeController();
+}}
+org.puremvc.haxe.core.Controller.__name__ = ["org","puremvc","haxe","core","Controller"];
+org.puremvc.haxe.core.Controller.getInstance = function() {
+	if(org.puremvc.haxe.core.Controller.instance == null) org.puremvc.haxe.core.Controller.instance = new org.puremvc.haxe.core.Controller();
+	return org.puremvc.haxe.core.Controller.instance;
+}
+org.puremvc.haxe.core.Controller.instance = null;
+org.puremvc.haxe.core.Controller.prototype.commandMap = null;
+org.puremvc.haxe.core.Controller.prototype.executeCommand = function(note) {
+	var commandClassRef = this.commandMap.get(note.getName());
+	if(commandClassRef == null) return;
+	var commandInstance = Type.createInstance(commandClassRef,[]);
+	commandInstance.execute(note);
+}
+org.puremvc.haxe.core.Controller.prototype.hasCommand = function(notificationName) {
+	return this.commandMap.exists(notificationName);
+}
+org.puremvc.haxe.core.Controller.prototype.initializeController = function() {
+	this.view = org.puremvc.haxe.core.View.getInstance();
+}
+org.puremvc.haxe.core.Controller.prototype.registerCommand = function(notificationName,commandClassRef) {
+	if(!this.commandMap.exists(notificationName)) this.view.registerObserver(notificationName,new org.puremvc.haxe.patterns.observer.Observer($closure(this,"executeCommand"),this));
+	this.commandMap.set(notificationName,commandClassRef);
+}
+org.puremvc.haxe.core.Controller.prototype.removeCommand = function(notificationName) {
+	if(this.hasCommand(notificationName)) {
+		this.view.removeObserver(notificationName,this);
+		this.commandMap.remove(notificationName);
+	}
+}
+org.puremvc.haxe.core.Controller.prototype.view = null;
+org.puremvc.haxe.core.Controller.prototype.__class__ = org.puremvc.haxe.core.Controller;
+org.puremvc.haxe.core.Controller.__interfaces__ = [org.puremvc.haxe.interfaces.IController];
 org.puremvc.haxe.interfaces.IModel = function() { }
 org.puremvc.haxe.interfaces.IModel.__name__ = ["org","puremvc","haxe","interfaces","IModel"];
 org.puremvc.haxe.interfaces.IModel.prototype.hasProxy = null;
@@ -816,40 +821,6 @@ org.puremvc.haxe.interfaces.IModel.prototype.registerProxy = null;
 org.puremvc.haxe.interfaces.IModel.prototype.removeProxy = null;
 org.puremvc.haxe.interfaces.IModel.prototype.retrieveProxy = null;
 org.puremvc.haxe.interfaces.IModel.prototype.__class__ = org.puremvc.haxe.interfaces.IModel;
-org.puremvc.haxe.core.model = {}
-org.puremvc.haxe.core.model.Model = function(p) { if( p === $_ ) return; {
-	org.puremvc.haxe.core.model.Model.instance = this;
-	this.proxyMap = new Hash();
-	this.initializeModel();
-}}
-org.puremvc.haxe.core.model.Model.__name__ = ["org","puremvc","haxe","core","model","Model"];
-org.puremvc.haxe.core.model.Model.getInstance = function() {
-	if(org.puremvc.haxe.core.model.Model.instance == null) org.puremvc.haxe.core.model.Model.instance = new org.puremvc.haxe.core.model.Model();
-	return org.puremvc.haxe.core.model.Model.instance;
-}
-org.puremvc.haxe.core.model.Model.instance = null;
-org.puremvc.haxe.core.model.Model.prototype.hasProxy = function(proxyName) {
-	return this.proxyMap.exists(proxyName);
-}
-org.puremvc.haxe.core.model.Model.prototype.initializeModel = function() {
-	null;
-}
-org.puremvc.haxe.core.model.Model.prototype.proxyMap = null;
-org.puremvc.haxe.core.model.Model.prototype.registerProxy = function(proxy) {
-	this.proxyMap.set(proxy.getProxyName(),proxy);
-	proxy.onRegister();
-}
-org.puremvc.haxe.core.model.Model.prototype.removeProxy = function(proxyName) {
-	var proxy = this.proxyMap.get(proxyName);
-	this.proxyMap.remove(proxyName);
-	proxy.onRemove();
-	return proxy;
-}
-org.puremvc.haxe.core.model.Model.prototype.retrieveProxy = function(proxyName) {
-	return this.proxyMap.get(proxyName);
-}
-org.puremvc.haxe.core.model.Model.prototype.__class__ = org.puremvc.haxe.core.model.Model;
-org.puremvc.haxe.core.model.Model.__interfaces__ = [org.puremvc.haxe.interfaces.IModel];
 org.puremvc.haxe.examples.simpleAdmin.view.MenuMediator = function(viewComponent) { if( viewComponent === $_ ) return; {
 	org.puremvc.haxe.patterns.mediator.Mediator.apply(this,[null,viewComponent]);
 	js.Lib.document.getElementById("remove_e").onclick = $closure(this,"onRemoveEmployee");
@@ -864,13 +835,6 @@ org.puremvc.haxe.examples.simpleAdmin.view.MenuMediator.prototype.getMediatorNam
 }
 org.puremvc.haxe.examples.simpleAdmin.view.MenuMediator.prototype.getMenu = function() {
 	return this.viewComponent;
-}
-org.puremvc.haxe.examples.simpleAdmin.view.MenuMediator.prototype.handleNotification = function(notification) {
-	switch(notification.getName()) {
-	}
-}
-org.puremvc.haxe.examples.simpleAdmin.view.MenuMediator.prototype.listNotificationInterests = function() {
-	return [];
 }
 org.puremvc.haxe.examples.simpleAdmin.view.MenuMediator.prototype.onNewEmployee = function(evt) {
 	this.facade.sendNotification("new_employee");
@@ -905,6 +869,41 @@ IntIter.prototype.next = function() {
 	return this.min++;
 }
 IntIter.prototype.__class__ = IntIter;
+org.puremvc.haxe.core.Model = function(p) { if( p === $_ ) return; {
+	org.puremvc.haxe.core.Model.instance = this;
+	this.proxyMap = new Hash();
+	this.initializeModel();
+}}
+org.puremvc.haxe.core.Model.__name__ = ["org","puremvc","haxe","core","Model"];
+org.puremvc.haxe.core.Model.getInstance = function() {
+	if(org.puremvc.haxe.core.Model.instance == null) org.puremvc.haxe.core.Model.instance = new org.puremvc.haxe.core.Model();
+	return org.puremvc.haxe.core.Model.instance;
+}
+org.puremvc.haxe.core.Model.instance = null;
+org.puremvc.haxe.core.Model.prototype.hasProxy = function(proxyName) {
+	return this.proxyMap.exists(proxyName);
+}
+org.puremvc.haxe.core.Model.prototype.initializeModel = function() {
+	null;
+}
+org.puremvc.haxe.core.Model.prototype.proxyMap = null;
+org.puremvc.haxe.core.Model.prototype.registerProxy = function(proxy) {
+	this.proxyMap.set(proxy.getProxyName(),proxy);
+	proxy.onRegister();
+}
+org.puremvc.haxe.core.Model.prototype.removeProxy = function(proxyName) {
+	var proxy = this.proxyMap.get(proxyName);
+	if(proxy != null) {
+		this.proxyMap.remove(proxyName);
+		proxy.onRemove();
+	}
+	return proxy;
+}
+org.puremvc.haxe.core.Model.prototype.retrieveProxy = function(proxyName) {
+	return this.proxyMap.get(proxyName);
+}
+org.puremvc.haxe.core.Model.prototype.__class__ = org.puremvc.haxe.core.Model;
+org.puremvc.haxe.core.Model.__interfaces__ = [org.puremvc.haxe.interfaces.IModel];
 Std = function() { }
 Std.__name__ = ["Std"];
 Std["is"] = function(v,t) {
@@ -917,31 +916,16 @@ Std["int"] = function(x) {
 	if(x < 0) return Math.ceil(x);
 	return Math.floor(x);
 }
-Std.bool = function(x) {
-	return (x !== 0 && x != null && x !== false);
-}
 Std.parseInt = function(x) {
-	{
-		var v = parseInt(x);
-		if(Math.isNaN(v)) return null;
-		return v;
-	}
+	var v = parseInt(x);
+	if(Math.isNaN(v)) return null;
+	return v;
 }
 Std.parseFloat = function(x) {
 	return parseFloat(x);
 }
-Std.chr = function(x) {
-	return String.fromCharCode(x);
-}
-Std.ord = function(x) {
-	if(x == "") return null;
-	else return x.charCodeAt(0);
-}
 Std.random = function(x) {
 	return Math.floor(Math.random() * x);
-}
-Std.resource = function(name) {
-	return js.Boot.__res[name];
 }
 Std.prototype.__class__ = Std;
 List = function(p) { if( p === $_ ) return; {
@@ -949,7 +933,7 @@ List = function(p) { if( p === $_ ) return; {
 }}
 List.__name__ = ["List"];
 List.prototype.add = function(item) {
-	var x = [item,null];
+	var x = [item];
 	if(this.h == null) this.h = x;
 	else this.q[1] = x;
 	this.q = x;
@@ -980,12 +964,10 @@ List.prototype.iterator = function() {
 	return { h : this.h, hasNext : function() {
 		return (this.h != null);
 	}, next : function() {
-		{
-			if(this.h == null) return null;
-			var x = this.h[0];
-			this.h = this.h[1];
-			return x;
-		}
+		if(this.h == null) return null;
+		var x = this.h[0];
+		this.h = this.h[1];
+		return x;
 	}}
 }
 List.prototype.join = function(sep) {
@@ -994,11 +976,11 @@ List.prototype.join = function(sep) {
 	var l = this.h;
 	while(l != null) {
 		if(first) first = false;
-		else s.add(sep);
-		s.add(l[0]);
+		else s.b += sep;
+		s.b += l[0];
 		l = l[1];
 	}
-	return s.toString();
+	return s.b;
 }
 List.prototype.last = function() {
 	return (this.q == null?null:this.q[0]);
@@ -1049,15 +1031,15 @@ List.prototype.toString = function() {
 	var s = new StringBuf();
 	var first = true;
 	var l = this.h;
-	s.add("{");
+	s.b += "{";
 	while(l != null) {
 		if(first) first = false;
-		else s.add(", ");
-		s.add(l[0]);
+		else s.b += ", ";
+		s.b += l[0];
 		l = l[1];
 	}
-	s.add("}");
-	return s.toString();
+	s.b += "}";
+	return s.b;
 }
 List.prototype.__class__ = List;
 org.puremvc.haxe.examples.simpleAdmin.SimpleAdminFacade = function(p) { if( p === $_ ) return; {
@@ -1105,32 +1087,6 @@ ValueType.TUnknown.toString = $estr;
 ValueType.TUnknown.__enum__ = ValueType;
 Type = function() { }
 Type.__name__ = ["Type"];
-Type.toEnum = function(t) {
-	try {
-		if(t.__ename__ == null) return null;
-		return t;
-	}
-	catch( $e8 ) {
-		{
-			var e = $e8;
-			null;
-		}
-	}
-	return null;
-}
-Type.toClass = function(t) {
-	try {
-		if(t.__name__ == null) return null;
-		return t;
-	}
-	catch( $e9 ) {
-		{
-			var e = $e9;
-			null;
-		}
-	}
-	return null;
-}
 Type.getClass = function(o) {
 	if(o == null) return null;
 	if(o.__enum__ != null) return null;
@@ -1154,48 +1110,53 @@ Type.getEnumName = function(e) {
 }
 Type.resolveClass = function(name) {
 	var cl;
-	{
-		try {
-			cl = eval(name);
-		}
-		catch( $e10 ) {
+	try {
+		cl = eval(name);
+	}
+	catch( $e7 ) {
+		{
+			var e = $e7;
 			{
-				var e = $e10;
-				{
-					cl = null;
-				}
+				cl = null;
 			}
 		}
-		if(cl == null || cl.__name__ == null) return null;
-		else null;
 	}
+	if(cl == null || cl.__name__ == null) return null;
 	return cl;
 }
 Type.resolveEnum = function(name) {
 	var e;
-	{
-		try {
-			e = eval(name);
-		}
-		catch( $e11 ) {
+	try {
+		e = eval(name);
+	}
+	catch( $e8 ) {
+		{
+			var err = $e8;
 			{
-				var e1 = $e11;
-				{
-					e1 = null;
-				}
+				e = null;
 			}
 		}
-		if(e == null || e.__ename__ == null) return null;
-		else null;
 	}
+	if(e == null || e.__ename__ == null) return null;
 	return e;
 }
 Type.createInstance = function(cl,args) {
-	if(args.length >= 6) throw "Too many arguments";
-	return new cl(args[0],args[1],args[2],args[3],args[4],args[5]);
+	if(args.length <= 3) return new cl(args[0],args[1],args[2]);
+	if(args.length > 8) throw "Too many arguments";
+	return new cl(args[0],args[1],args[2],args[3],args[4],args[5],args[6],args[7]);
 }
 Type.createEmptyInstance = function(cl) {
 	return new cl($_);
+}
+Type.createEnum = function(e,constr,params) {
+	var f = Reflect.field(e,constr);
+	if(f == null) throw "No such constructor " + constr;
+	if(Reflect.isFunction(f)) {
+		if(params == null) throw "Constructor " + constr + " need parameters";
+		return f.apply(e,params);
+	}
+	if(params != null && params.length != 0) throw "Constructor " + constr + " does not need parameters";
+	return f;
 }
 Type.getInstanceFields = function(c) {
 	var a = Reflect.fields(c.prototype);
@@ -1296,110 +1257,102 @@ js.Boot.__unhtml = function(s) {
 	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
 }
 js.Boot.__trace = function(v,i) {
-	{
-		var msg = (i != null?i.fileName + ":" + i.lineNumber + ": ":"");
-		msg += js.Boot.__unhtml(js.Boot.__string_rec(v,"")) + "<br/>";
-		var d = document.getElementById("haxe:trace");
-		if(d == null) alert("No haxe:trace element defined\n" + msg);
-		else d.innerHTML += msg;
-	}
+	var msg = (i != null?i.fileName + ":" + i.lineNumber + ": ":"");
+	msg += js.Boot.__unhtml(js.Boot.__string_rec(v,"")) + "<br/>";
+	var d = document.getElementById("haxe:trace");
+	if(d == null) alert("No haxe:trace element defined\n" + msg);
+	else d.innerHTML += msg;
 }
 js.Boot.__clear_trace = function() {
-	{
-		var d = document.getElementById("haxe:trace");
-		if(d != null) d.innerHTML = "";
-		else null;
-	}
+	var d = document.getElementById("haxe:trace");
+	if(d != null) d.innerHTML = "";
+	else null;
 }
 js.Boot.__closure = function(o,f) {
-	{
-		var m = o[f];
-		if(m == null) return null;
-		var f1 = function() {
-			return m.apply(o,arguments);
-		}
-		f1.scope = o;
-		f1.method = m;
-		return f1;
+	var m = o[f];
+	if(m == null) return null;
+	var f1 = function() {
+		return m.apply(o,arguments);
 	}
+	f1.scope = o;
+	f1.method = m;
+	return f1;
 }
 js.Boot.__string_rec = function(o,s) {
-	{
-		if(o == null) return "null";
-		if(s.length >= 5) return "<...>";
-		var t = typeof(o);
-		if(t == "function" && (o.__name__ != null || o.__ename__ != null)) t = "object";
-		switch(t) {
-		case "object":{
-			if(o instanceof Array) {
-				if(o.__enum__ != null) {
-					if(o.length == 2) return o[0];
-					var str = o[0] + "(";
-					s += "\t";
-					{
-						var _g1 = 2, _g = o.length;
-						while(_g1 < _g) {
-							var i = _g1++;
-							if(i != 2) str += "," + js.Boot.__string_rec(o[i],s);
-							else str += js.Boot.__string_rec(o[i],s);
-						}
-					}
-					return str + ")";
-				}
-				var l = o.length;
-				var i;
-				var str = "[";
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ != null || o.__ename__ != null)) t = "object";
+	switch(t) {
+	case "object":{
+		if(o instanceof Array) {
+			if(o.__enum__ != null) {
+				if(o.length == 2) return o[0];
+				var str = o[0] + "(";
 				s += "\t";
 				{
-					var _g = 0;
-					while(_g < l) {
-						var i1 = _g++;
-						str += ((i1 > 0?",":"")) + js.Boot.__string_rec(o[i1],s);
+					var _g1 = 2, _g = o.length;
+					while(_g1 < _g) {
+						var i = _g1++;
+						if(i != 2) str += "," + js.Boot.__string_rec(o[i],s);
+						else str += js.Boot.__string_rec(o[i],s);
 					}
 				}
-				str += "]";
-				return str;
+				return str + ")";
 			}
-			var tostr;
-			try {
-				tostr = o.toString;
-			}
-			catch( $e12 ) {
-				{
-					var e = $e12;
-					{
-						return "???";
-					}
-				}
-			}
-			if(tostr != null && tostr != Object.toString) {
-				var s2 = o.toString();
-				if(s2 != "[object Object]") return s2;
-			}
-			var k;
-			var str = "{\n";
+			var l = o.length;
+			var i;
+			var str = "[";
 			s += "\t";
-			var hasp = (o.hasOwnProperty != null);
-			for( var k in o ) { ;
-			if(hasp && !o.hasOwnProperty(k)) continue;
-			if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__") continue;
-			if(str.length != 2) str += ", \n";
-			str += s + k + " : " + js.Boot.__string_rec(o[k],s);
+			{
+				var _g = 0;
+				while(_g < l) {
+					var i1 = _g++;
+					str += ((i1 > 0?",":"")) + js.Boot.__string_rec(o[i1],s);
+				}
 			}
-			s = s.substring(1);
-			str += "\n" + s + "}";
+			str += "]";
 			return str;
-		}break;
-		case "function":{
-			return "<function>";
-		}break;
-		case "string":{
-			return o;
-		}break;
-		default:{
-			return String(o);
-		}break;
 		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		}
+		catch( $e9 ) {
+			{
+				var e = $e9;
+				{
+					return "???";
+				}
+			}
+		}
+		if(tostr != null && tostr != Object.toString) {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") return s2;
+		}
+		var k = null;
+		var str = "{\n";
+		s += "\t";
+		var hasp = (o.hasOwnProperty != null);
+		for( var k in o ) { ;
+		if(hasp && !o.hasOwnProperty(k)) continue;
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__") continue;
+		if(str.length != 2) str += ", \n";
+		str += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str += "\n" + s + "}";
+		return str;
+	}break;
+	case "function":{
+		return "<function>";
+	}break;
+	case "string":{
+		return o;
+	}break;
+	default:{
+		return String(o);
+	}break;
 	}
 }
 js.Boot.__interfLoop = function(cc,cl) {
@@ -1417,103 +1370,90 @@ js.Boot.__interfLoop = function(cc,cl) {
 	return js.Boot.__interfLoop(cc.__super__,cl);
 }
 js.Boot.__instanceof = function(o,cl) {
-	{
-		try {
-			if(o instanceof cl) {
-				if(cl == Array) return (o.__enum__ == null);
-				return true;
-			}
-			if(js.Boot.__interfLoop(o.__class__,cl)) return true;
-		}
-		catch( $e13 ) {
-			{
-				var e = $e13;
-				{
-					if(cl == null) return false;
-				}
-			}
-		}
-		switch(cl) {
-		case Int:{
-			return (Math.ceil(o) === o) && isFinite(o);
-		}break;
-		case Float:{
-			return typeof(o) == "number";
-		}break;
-		case Bool:{
-			return (o === true || o === false);
-		}break;
-		case String:{
-			return typeof(o) == "string";
-		}break;
-		case Dynamic:{
+	try {
+		if(o instanceof cl) {
+			if(cl == Array) return (o.__enum__ == null);
 			return true;
-		}break;
-		default:{
-			if(o != null && o.__enum__ == cl) return true;
-			return false;
-		}break;
 		}
+		if(js.Boot.__interfLoop(o.__class__,cl)) return true;
+	}
+	catch( $e10 ) {
+		{
+			var e = $e10;
+			{
+				if(cl == null) return false;
+			}
+		}
+	}
+	switch(cl) {
+	case Int:{
+		return Math.ceil(o) === o && isFinite(o);
+	}break;
+	case Float:{
+		return typeof(o) == "number";
+	}break;
+	case Bool:{
+		return o === true || o === false;
+	}break;
+	case String:{
+		return typeof(o) == "string";
+	}break;
+	case Dynamic:{
+		return true;
+	}break;
+	default:{
+		if(o == null) return false;
+		return o.__enum__ == cl || (cl == Class && o.__name__ != null) || (cl == Enum && o.__ename__ != null);
+	}break;
 	}
 }
 js.Boot.__init = function() {
-	{
-		js.Lib.isIE = (document.all != null && window.opera == null);
-		js.Lib.isOpera = (window.opera != null);
-		Array.prototype.copy = Array.prototype.slice;
-		Array.prototype.insert = function(i,x) {
-			this.splice(i,0,x);
-		}
-		Array.prototype.remove = function(obj) {
-			var i = 0;
-			var l = this.length;
-			while(i < l) {
-				if(this[i] == obj) {
-					this.splice(i,1);
-					return true;
-				}
-				i++;
-			}
-			return false;
-		}
-		Array.prototype.iterator = function() {
-			return { cur : 0, arr : this, hasNext : function() {
-				return this.cur < this.arr.length;
-			}, next : function() {
-				return this.arr[this.cur++];
-			}}
-		}
-		String.prototype.__class__ = String;
-		String.__name__ = ["String"];
-		Array.prototype.__class__ = Array;
-		Array.__name__ = ["Array"];
-		var cca = String.prototype.charCodeAt;
-		String.prototype.charCodeAt = function(i) {
-			var x = cca.call(this,i);
-			if(isNaN(x)) return null;
-			return x;
-		}
-		var oldsub = String.prototype.substr;
-		String.prototype.substr = function(pos,len) {
-			if(pos != null && pos != 0 && len != null && len < 0) return "";
-			if(len == null) len = this.length;
-			if(pos < 0) {
-				pos = this.length + pos;
-				if(pos < 0) pos = 0;
-			}
-			else if(len < 0) {
-				len = this.length + len - pos;
-			}
-			return oldsub.apply(this,[pos,len]);
-		}
-		Int = new Object();
-		Dynamic = new Object();
-		Float = Number;
-		Bool = new Object();
-		Bool["true"] = true;
-		Bool["false"] = false;
-		$closure = js.Boot.__closure;
+	js.Lib.isIE = (document.all != null && window.opera == null);
+	js.Lib.isOpera = (window.opera != null);
+	Array.prototype.copy = Array.prototype.slice;
+	Array.prototype.insert = function(i,x) {
+		this.splice(i,0,x);
 	}
+	Array.prototype.remove = function(obj) {
+		var i = 0;
+		var l = this.length;
+		while(i < l) {
+			if(this[i] == obj) {
+				this.splice(i,1);
+				return true;
+			}
+			i++;
+		}
+		return false;
+	}
+	Array.prototype.iterator = function() {
+		return { cur : 0, arr : this, hasNext : function() {
+			return this.cur < this.arr.length;
+		}, next : function() {
+			return this.arr[this.cur++];
+		}}
+	}
+	var cca = String.prototype.charCodeAt;
+	String.prototype.cca = cca;
+	String.prototype.charCodeAt = function(i) {
+		var x = cca.call(this,i);
+		if(isNaN(x)) return null;
+		return x;
+	}
+	var oldsub = String.prototype.substr;
+	String.prototype.substr = function(pos,len) {
+		if(pos != null && pos != 0 && len != null && len < 0) return "";
+		if(len == null) len = this.length;
+		if(pos < 0) {
+			pos = this.length + pos;
+			if(pos < 0) pos = 0;
+		}
+		else if(len < 0) {
+			len = this.length + len - pos;
+		}
+		return oldsub.apply(this,[pos,len]);
+	}
+	$closure = js.Boot.__closure;
 }
 js.Boot.prototype.__class__ = js.Boot;
 IntHash = function(p) { if( p === $_ ) return; {
@@ -1558,19 +1498,19 @@ IntHash.prototype.set = function(key,value) {
 }
 IntHash.prototype.toString = function() {
 	var s = new StringBuf();
-	s.add("{");
+	s.b += "{";
 	var it = this.keys();
-	{ var $it14 = it;
-	while( $it14.hasNext() ) { var i = $it14.next();
+	{ var $it11 = it;
+	while( $it11.hasNext() ) { var i = $it11.next();
 	{
-		s.add(i);
-		s.add(" => ");
-		s.add(Std.string(this.get(i)));
-		if(it.hasNext()) s.add(", ");
+		s.b += i;
+		s.b += " => ";
+		s.b += Std.string(this.get(i));
+		if(it.hasNext()) s.b += ", ";
 	}
 	}}
-	s.add("}");
-	return s.toString();
+	s.b += "}";
+	return s.b;
 }
 IntHash.prototype.__class__ = IntHash;
 org.puremvc.haxe.patterns.observer.Notification = function(name,body,type) { if( name === $_ ) return; {
@@ -1649,14 +1589,12 @@ org.puremvc.haxe.examples.simpleAdmin.controller.RemoveEmployee.prototype.execut
 }
 org.puremvc.haxe.examples.simpleAdmin.controller.RemoveEmployee.prototype.__class__ = org.puremvc.haxe.examples.simpleAdmin.controller.RemoveEmployee;
 Hash = function(p) { if( p === $_ ) return; {
-	{
-		this.h = {}
-		if(this.h.__proto__ != null) {
-			this.h.__proto__ = null;
-			delete(this.h.__proto__);
-		}
-		else null;
+	this.h = {}
+	if(this.h.__proto__ != null) {
+		this.h.__proto__ = null;
+		delete(this.h.__proto__);
 	}
+	else null;
 }}
 Hash.__name__ = ["Hash"];
 Hash.prototype.exists = function(key) {
@@ -1664,9 +1602,9 @@ Hash.prototype.exists = function(key) {
 		key = "$" + key;
 		return this.hasOwnProperty.call(this.h,key);
 	}
-	catch( $e15 ) {
+	catch( $e12 ) {
 		{
-			var e = $e15;
+			var e = $e12;
 			{
 				
 				for(var i in this.h)
@@ -1707,19 +1645,19 @@ Hash.prototype.set = function(key,value) {
 }
 Hash.prototype.toString = function() {
 	var s = new StringBuf();
-	s.add("{");
+	s.b += "{";
 	var it = this.keys();
-	{ var $it16 = it;
-	while( $it16.hasNext() ) { var i = $it16.next();
+	{ var $it13 = it;
+	while( $it13.hasNext() ) { var i = $it13.next();
 	{
-		s.add(i);
-		s.add(" => ");
-		s.add(Std.string(this.get(i)));
-		if(it.hasNext()) s.add(", ");
+		s.b += i;
+		s.b += " => ";
+		s.b += Std.string(this.get(i));
+		if(it.hasNext()) s.b += ", ";
 	}
 	}}
-	s.add("}");
-	return s.toString();
+	s.b += "}";
+	return s.b;
 }
 Hash.prototype.__class__ = Hash;
 $Main = function() { }
@@ -1728,6 +1666,20 @@ $Main.prototype.__class__ = $Main;
 $_ = {}
 js.Boot.__res = {}
 js.Boot.__init();
+{
+	String.prototype.__class__ = String;
+	String.__name__ = ["String"];
+	Array.prototype.__class__ = Array;
+	Array.__name__ = ["Array"];
+	Int = { __name__ : ["Int"]}
+	Dynamic = { __name__ : ["Dynamic"]}
+	Float = Number;
+	Float.__name__ = ["Float"];
+	Bool = { __ename__ : ["Bool"]}
+	Class = { __name__ : ["Class"]}
+	Enum = { }
+	Void = { __ename__ : ["Void"]}
+}
 {
 	Math.NaN = Number["NaN"];
 	Math.NEGATIVE_INFINITY = Number["NEGATIVE_INFINITY"];
@@ -1738,16 +1690,15 @@ js.Boot.__init();
 	Math.isNaN = function(i) {
 		return isNaN(i);
 	}
+	Math.__name__ = ["Math"];
 }
 {
-	
-			onerror = function(msg,url,line) {
-				var f = js.Lib.onerror;
-				if( f == null )
-					return false;
-				return f(msg,[url+":"+line]);
-			}
-		;
+	onerror = function(msg,url,line) {
+		var f = js.Lib.onerror;
+		if( f == null )
+			return false;
+		return f(msg,[url+":"+line]);
+	}
 }
 org.puremvc.haxe.patterns.mediator.Mediator.NAME = "Mediator";
 org.puremvc.haxe.examples.simpleAdmin.view.EmployeesMediator.NAME = "EmployeesMediator";
