@@ -12,6 +12,12 @@ import flash.text.TextFormat;
 import flash.text.TextFieldAutoSize;
 import flash.display.Sprite;
 
+#if haxe3
+import haxe.ds.IntMap;
+#else
+private typedef IntMap<T> = IntHash<T>;
+#end
+
 class Fl9Employees implements IEmployees
 {
 	//	the view
@@ -28,7 +34,7 @@ class Fl9Employees implements IEmployees
 	/**
 	 * Removes all children in the view and creates the new ones.
 	 */
-	public	function updateList( map: IntHash<EmployeeVO> ): Void
+	public	function updateList( map: IntMap<EmployeeVO> ): Void
 	{
 		while( _container.numChildren > 0 )
 		{

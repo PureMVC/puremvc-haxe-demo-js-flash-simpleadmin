@@ -7,10 +7,16 @@ package org.puremvc.haxe.examples.simpleAdmin.ui;
 
 import org.puremvc.haxe.examples.simpleAdmin.model.vo.EmployeeVO;
 
+#if haxe3
+import haxe.ds.IntMap;
+#else
+private typedef IntMap<T> = IntHash<T>;
+#end
+
 /**
  * Interface that must be implemented by js/fl9 emplyees views
  */
 interface IEmployees
 {
-	function updateList( map: IntHash<EmployeeVO> ): Void;
+	function updateList( map: IntMap<EmployeeVO> ): Void;
 }

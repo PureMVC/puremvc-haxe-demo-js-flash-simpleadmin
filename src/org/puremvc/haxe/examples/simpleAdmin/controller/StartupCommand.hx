@@ -37,7 +37,14 @@ class StartupCommand extends SimpleCommand
 		var menu;
 		var menu_container;
 		#if js
-		menu_container = js.Lib.document.getElementById( "menu" );
+		
+		#if haxe3
+		var document = js.Browser.document;
+		#else
+		var document = js.Lib.document;
+		#end
+		
+		menu_container = document.getElementById( "menu" );
 		menu = new JsMenu( menu_container );
 		#elseif flash9
 		menu_container = new Sprite();
@@ -50,7 +57,7 @@ class StartupCommand extends SimpleCommand
 		var employees;
 		var employees_container;
 		#if js
-		employees_container = js.Lib.document.getElementById( "employees" );
+		employees_container = document.getElementById( "employees" );
 		employees = new JsEmployees( employees_container );
 		#elseif flash9
 		employees_container = new Sprite();
@@ -65,7 +72,7 @@ class StartupCommand extends SimpleCommand
 		var details;
 		var details_container;
 		#if js
-		details_container = js.Lib.document.getElementById( "details" );
+		details_container = document.getElementById( "details" );
 		details = new JsDetails( details_container );
 		#elseif flash9
 		details_container = new Sprite();
