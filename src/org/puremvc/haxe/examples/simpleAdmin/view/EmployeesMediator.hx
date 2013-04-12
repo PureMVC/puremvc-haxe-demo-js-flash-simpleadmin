@@ -31,7 +31,13 @@ class EmployeesMediator extends Mediator
 		super( viewComponent );
 		
 		#if js
+		
+		#if haxe3
+		js.Browser.document.getElementById( "employees" ).onclick = onEmployeeClick;
+		#else
 		js.Lib.document.getElementById( "employees" ).onclick = onEmployeeClick;
+		#end
+		
 		#elseif flash9
 		cast( viewComponent ).getContainer().addEventListener( MouseEvent.CLICK, onEmployeeClick );
 		#else error
@@ -44,11 +50,15 @@ class EmployeesMediator extends Mediator
 	 * Handler for a clicked employee from the list
 	 * Retrieves the employee id and sends a notification with the id as the body
 	 */
-	private function onEmployeeClick( evt ): Void
+	#if (js && haxe3)
+	private function onEmployeeClick( evt: js.html.Event  ): Void
+	#else
+	private function onEmployeeClick( evt  ): Void
+	#end
 	{
 		var id;
 		#if js
-		id = evt.target.getAttribute( "href" ).split( "#" )[ 1 ];
+		id = untyped evt.target.getAttribute( "href" ).split( "#" )[ 1 ];
 		#elseif flash9
 		id = evt.target.id;
 		#else error

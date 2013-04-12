@@ -9,7 +9,7 @@ import org.puremvc.haxe.examples.simpleAdmin.ui.IMenu;
 import org.puremvc.haxe.examples.simpleAdmin.SimpleAdminFacade;
 #if js
 import org.puremvc.haxe.examples.simpleAdmin.ui.JsMenu;
-import js.Dom;
+
 #elseif flash9
 import org.puremvc.haxe.examples.simpleAdmin.ui.Fl9Menu;
 import flash.events.MouseEvent;
@@ -33,9 +33,17 @@ class MenuMediator extends Mediator
 		super( viewComponent );
 		
 		#if js
-		js.Lib.document.getElementById( "remove_e" ).onclick = onRemoveEmployee;
-		js.Lib.document.getElementById( "new_e" ).onclick = onNewEmployee;
-		js.Lib.document.getElementById( "save_e" ).onclick = onSaveEmployee;
+		
+		#if haxe3
+		var document = js.Browser.document;
+		#else
+		var document = js.Lib.document;
+		#end
+		
+		document.getElementById( "remove_e" ).onclick = onRemoveEmployee;
+		document.getElementById( "new_e" ).onclick = onNewEmployee;
+		document.getElementById( "save_e" ).onclick = onSaveEmployee;
+		
 		#elseif flash9
 		cast(viewComponent).new_e.addEventListener( MouseEvent.CLICK, onNewEmployee );
 		cast(viewComponent).remove_e.addEventListener( MouseEvent.CLICK, onRemoveEmployee );

@@ -11,7 +11,12 @@ package org.puremvc.haxe.examples.simpleAdmin.model.vo;
 class EmployeeVO
 {
 	//	employee data
-	public var id( getId, null ): Int;
+	#if haxe3
+	public var id( get, null ): Int;
+	#else
+	public var id( get_id, null ): Int;
+	#end
+	
 	public var name( default, default ): String;
 	public var lastname( default, default ): String;
 	public var role( default, default ): String;
@@ -24,6 +29,11 @@ class EmployeeVO
 	}
 	
 	private function getId()
+	{
+		return get_id();
+	}
+	
+	private function get_id()
 	{
 		return _id;
 	}
