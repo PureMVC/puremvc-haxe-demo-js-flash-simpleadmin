@@ -7,17 +7,22 @@ package org.puremvc.haxe.examples.simpleAdmin.ui;
 
 import org.puremvc.haxe.examples.simpleAdmin.model.vo.EmployeeVO;
 
+#if haxe3
+import js.html.Element;
+#else
 import js.Dom;
+private typedef Element = HtmlDom;
+#end
 
 class JsDetails implements IDetails
 {
 	//	the view
-	private var _container: HtmlDom;
+	private var _container: Element;
 	
 	/**
 	 * Constructor.
 	 */
-	public function new( container: HtmlDom )
+	public function new( container: Element )
 	{
 		_container = container;
 		
@@ -29,11 +34,17 @@ class JsDetails implements IDetails
 	 */
 	public function newEmployee( id: Int ): Void
 	{
-		var em_id = js.Lib.document.getElementById( "em_id" );
+		#if haxe3
+		var document = js.Browser.document;
+		#else
+		var document = js.Lib.document;
+		#end
+		
+		var em_id = document.getElementById( "em_id" );
 		em_id.innerHTML = Std.string( id );		
-		cast( js.Lib.document.getElementById( "em_name" ) ).value = "";
-		cast( js.Lib.document.getElementById( "em_lastname" ) ).value = "";
-		cast( js.Lib.document.getElementById( "em_role" ) ).value = "";
+		cast( document.getElementById( "em_name" ) ).value = "";
+		cast( document.getElementById( "em_lastname" ) ).value = "";
+		cast( document.getElementById( "em_role" ) ).value = "";
 	}
 	
 	/**
@@ -41,10 +52,16 @@ class JsDetails implements IDetails
 	 */
 	public function getDetails(): EmployeeVO
 	{
-		var vo = new EmployeeVO( Std.parseInt( js.Lib.document.getElementById( "em_id" ).innerHTML ) );
-		vo.name = cast( js.Lib.document.getElementById( "em_name" ) ).value;
-		vo.lastname = cast( js.Lib.document.getElementById( "em_lastname" ) ).value;
-		vo.role = cast( js.Lib.document.getElementById( "em_role" ) ).value;
+		#if haxe3
+		var document = js.Browser.document;
+		#else
+		var document = js.Lib.document;
+		#end
+		
+		var vo = new EmployeeVO( Std.parseInt( document.getElementById( "em_id" ).innerHTML ) );
+		vo.name = cast( document.getElementById( "em_name" ) ).value;
+		vo.lastname = cast( document.getElementById( "em_lastname" ) ).value;
+		vo.role = cast( document.getElementById( "em_role" ) ).value;
 		return vo;
 	}
 
@@ -53,13 +70,19 @@ class JsDetails implements IDetails
 	 */
 	public function setDetails( vo: EmployeeVO ): Void
 	{
-		js.Lib.document.getElementById( "em_id" ).innerHTML = Std.string( vo.id );
+		#if haxe3
+		var document = js.Browser.document;
+		#else
+		var document = js.Lib.document;
+		#end
+		
+		document.getElementById( "em_id" ).innerHTML = Std.string( vo.id );
 		if ( vo.name != null )
-			cast( js.Lib.document.getElementById( "em_name" ) ).value = vo.name;
+			cast( document.getElementById( "em_name" ) ).value = vo.name;
 		if ( vo.lastname != null )
-			cast( js.Lib.document.getElementById( "em_lastname" ) ).value = vo.lastname;
+			cast( document.getElementById( "em_lastname" ) ).value = vo.lastname;
 		if ( vo.role != null )
-			cast( js.Lib.document.getElementById( "em_role" ) ).value = vo.role;
+			cast( document.getElementById( "em_role" ) ).value = vo.role;
 	}
 
 }

@@ -8,6 +8,12 @@ package org.puremvc.haxe.examples.simpleAdmin.model;
 import org.puremvc.haxe.examples.simpleAdmin.model.vo.EmployeeVO;
 import org.puremvc.haxe.patterns.proxy.Proxy;
 
+#if haxe3
+import haxe.ds.IntMap;
+#else
+private typedef IntMap<T> = IntHash<T>;
+#end
+
 class EmployeesProxy extends Proxy
 {
 
@@ -21,13 +27,13 @@ class EmployeesProxy extends Proxy
 	 */
 	public function new()
 	{
-		super( NAME, new IntHash<EmployeeVO>() );
+		super( NAME, new IntMap<EmployeeVO>() );
 	}
 
 	/**
 	 * Getter method for proxy data.
 	 */
-	public function getEmployees(): IntHash<EmployeeVO>
+	public function getEmployees(): IntMap<EmployeeVO>
 	{
 		return data;
 	}
@@ -61,7 +67,7 @@ class EmployeesProxy extends Proxy
 	 */
 	public function saveEmployee( vo: EmployeeVO ): Void
 	{
-		data.set( vo.id, vo );
+		getEmployees().set( vo.id, vo );
 	}
 	
 	/**

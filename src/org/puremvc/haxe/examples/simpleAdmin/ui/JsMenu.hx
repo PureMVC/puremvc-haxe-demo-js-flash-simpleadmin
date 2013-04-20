@@ -5,17 +5,22 @@
  */
 package org.puremvc.haxe.examples.simpleAdmin.ui;
 
+#if haxe3
+import js.html.Element;
+#else
 import js.Dom;
+typedef Element = HtmlDom;
+#end
 
 class JsMenu implements IMenu
 {
 	//	the view
-	private var _container: HtmlDom;
+	private var _container: Element;
 	
 	/**
 	 * Constructor.
 	 */
-	public function new( container: HtmlDom )
+	public function new( container: Element )
 	{
 		_container = container;
 	}
