@@ -8,7 +8,7 @@ This demo illustrates the use of haXe to create a simple list administration app
 ![PureMVC Haxe Demo: Simple Admin](http://puremvc.org/pages/images/screenshots/PureMVC-Shot-Haxe-SimpleAdmin.png)
 
 ## Status
-Production - [Version 1.1](https://github.com/PureMVC/puremvc-haxe-demo-js-flash-simpleadmin/blob/master/VERSION)
+Production - [Version 1.2](https://github.com/PureMVC/puremvc-haxe-demo-js-flash-simpleadmin/blob/master/VERSION)
 
 ## Platforms / Technologies
 * [Haxe](http://en.wikipedia.org/wiki/Haxe)
