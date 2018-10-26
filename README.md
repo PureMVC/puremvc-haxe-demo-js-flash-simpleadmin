@@ -1,7 +1,7 @@
 ## [PureMVC](http://puremvc.github.com/) [Haxe](https://github.com/PureMVC/puremvc-haxe-standard-framework/wiki) Demo: Simple Admin
 This demo illustrates the use of haXe to create a simple list administration application that cross-compiles to both Flash and JavaScript from the same source code.
 
-* [Live Demo](http://darkstar.puremvc.org/content_header.html?url=http://puremvc.org/pages/demos/Haxe/SimpleAdmin/&desc=PureMVC%20Haxe%20Demo:%20Simple%20Admin)
+* [Live Demo](http://puremvc.org/pages/demos/Haxe/SimpleAdmin/)
 * [Discussion](http://forums.puremvc.org/index.php?topic=402.0)
 
 ## Screenshot
